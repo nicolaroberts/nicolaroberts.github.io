@@ -1,5 +1,5 @@
-title:            Site Title
-description:      Describe your website here.
+title:            approaching significance
+description:      "my self-help guide to statistics, computers and genomes"
 disqus_shortname: hpstrtheme
 reading_time:     true
 words_per_minute: 200
@@ -9,19 +9,14 @@ url:
 
 # Owner/author information
 owner:
-  name:           Your Name
+  name:           Nicola Roberts
   avatar:         avatar.jpg
-  bio:            "Your bio goes here. It shouldn't be super long but a good two sentences or two should suffice."
-  email:          you@email.com
+  bio:            "PhD student in cancer genomics at Wellcome Trust Sanger Institute."
+  email:          nr3@sanger.ac.uk
   # Social networking links used in footer. Update and remove as you like.
-  twitter:        
-  facebook:       
-  github:         
-  stackexchange:  
-  linkedin:       
-  instagram:      
-  flickr:         
-  tumblr:         
+  twitter:        https://twitter.com/NicolaRbrts
+  github:         https://github.com/nicolaroberts
+  linkedin:              
   # google plus id, include the '+', eg +mmistakes
   google_plus:    +yourid
 
@@ -35,7 +30,7 @@ google_verify:
 bing_verify:         
 
 # http://en.wikipedia.org/wiki/List_of_tz_database_time_zones
-timezone:    America/New_York
+timezone:    Europe/London
 future:      true
 highlighter: pygments
 markdown:    kramdown
