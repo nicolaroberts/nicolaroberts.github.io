@@ -1,6 +1,6 @@
 title:            "approaching significance"
 description:      "self-help guide to statistics, computers, and genomes"
-disqus_shortname: hpstrtheme
+disqus_shortname: nicolarbrts
 reading_time:     true
 words_per_minute: 200
 # Your site's domain goes here (eg: //mmistakes.github.io, http://mademistakes.com, etc)
@@ -12,10 +12,10 @@ owner:
   name:           Nicola Roberts
   avatar:         nicolaroberts.jpg
   bio:            "PhD student. Cancer Genome Project. Sanger Institute."
+  email:          nr3@sanger.ac.uk
   twitter:        NicolaRbrts
   github:         nicolaroberts
-  email:          nr3@sanger.ac.uk
-  linkedin:       nicola-roberts/a6/ba7/6a5
+
 
 # Background image to be tiled on all pages
 background: 
