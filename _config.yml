@@ -1,5 +1,5 @@
-title:            "approaching significance: my self-help guide to statistics, computers and genomes"
-description:      ""
+title:            "approaching significance"
+description:      "self-help guide to statistics, computers, and genomes"
 disqus_shortname: hpstrtheme
 reading_time:     true
 words_per_minute: 200
@@ -10,13 +10,12 @@ url:              http://nicolaroberts.github.io/
 # Owner/author information
 owner:
   name:           Nicola Roberts
-  avatar:         avatar.jpg
-  bio:            "PhD student, Cancer Genome Project, Wellcome Trust Sanger Institute"
+  avatar:         nicolaroberts.jpg
+  bio:            "PhD student. Cancer Genome Project. Sanger Institute."
+  twitter:        NicolaRbrts
+  github:         nicolaroberts
   email:          nr3@sanger.ac.uk
-  # Social networking links used in footer. Update and remove as you like.
-  twitter:        https://twitter.com/NicolaRbrts
-  github:         https://github.com/nicolaroberts
-  linkedin:       https://uk.linkedin.com/pub/nicola-roberts/a6/ba7/6a5
+  linkedin:       nicola-roberts/a6/ba7/6a5
 
 # Background image to be tiled on all pages
 background: 
