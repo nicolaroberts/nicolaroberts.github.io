@@ -47,9 +47,17 @@ Every time:
 * Paste local server address into browser
 * Simply refresh the browser to incorporate edits on the go
 
+Unfortunately, links in the local development version still point to the published online site without the edits. To get the links pointing between local in-development pages, comment out the `url` field in the `_config.yml` file. Don't keep and commit that though!
+
+
 
 ## Enable DISQUS comments system
 
 * Get Disqus account, click 'Add Disqus To Site', fill out details
 * Will create site `https://disqus_shortname.disqus.com/admin/moderate/`
 * Edit `disqus_shortname` field in `_config.yml`
+
+
+## Google analytics and verify
+
+To do. 
