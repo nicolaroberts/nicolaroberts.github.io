@@ -1,6 +1,6 @@
 ---
 layout: page
-title: About my blog
+title: About
 image:
   feature: abstract-5.jpg
   credit: dargadgetz
@@ -9,4 +9,4 @@ comments: false
 modified: 2015-07-20
 ---
 
-About text. 
+My self-help guide to statistics, computers, and genomes. 
