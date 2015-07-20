@@ -1,24 +1,22 @@
-title:            approaching significance
-description:      "my self-help guide to statistics, computers and genomes"
+title:            "approaching significance: my self-help guide to statistics, computers and genomes"
+description:      ""
 disqus_shortname: hpstrtheme
 reading_time:     true
 words_per_minute: 200
 # Your site's domain goes here (eg: //mmistakes.github.io, http://mademistakes.com, etc)
 # When testing locally leave blank or use http://localhost:4000
-url:
+url:              http://nicolaroberts.github.io/
 
 # Owner/author information
 owner:
   name:           Nicola Roberts
   avatar:         avatar.jpg
-  bio:            "PhD student in cancer genomics at Wellcome Trust Sanger Institute."
+  bio:            "PhD student, Cancer Genome Project, Wellcome Trust Sanger Institute"
   email:          nr3@sanger.ac.uk
   # Social networking links used in footer. Update and remove as you like.
   twitter:        https://twitter.com/NicolaRbrts
   github:         https://github.com/nicolaroberts
-  linkedin:              
-  # google plus id, include the '+', eg +mmistakes
-  google_plus:    +yourid
+  linkedin:       https://uk.linkedin.com/pub/nicola-roberts/a6/ba7/6a5
 
 # Background image to be tiled on all pages
 background: 
