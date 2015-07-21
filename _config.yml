@@ -5,7 +5,7 @@ reading_time:     false
 words_per_minute: 200
 # Your site's domain goes here (eg: //mmistakes.github.io, http://mademistakes.com, etc)
 # When testing locally leave blank or use http://localhost:4000
-url:              http://nicolaroberts.github.io/
+url:              http://nicolaroberts.github.io
 
 # Owner/author information
 owner:
@@ -22,7 +22,7 @@ background:
 
 # Analytics and webmaster tools stuff goes here
 google_analytics:   
-google_verify:      
+google_verify:      gDHqEFeN0KlsoBRS9I3VvvvrUhhSOA3RWcT_fkkgqPI
 # https://ssl.bing.com/webmaster/configure/verify/ownership Option 2 content= goes here
 bing_verify:         
 
