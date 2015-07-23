@@ -1,6 +1,6 @@
 ---
 layout: post
-title: R packages part 1&#58 up and running
+title: "R packages part 1: up and running"
 description: "R package set up, structure, DESCRIPTION file, R source code, documentation, NAMESPACE, etc."
 tags: [R, R package]
 modified: 2015-07-23
