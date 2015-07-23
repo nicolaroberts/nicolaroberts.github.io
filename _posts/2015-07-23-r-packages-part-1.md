@@ -162,15 +162,15 @@ illustrate <- function(x, y){
 
 See [this guide](http://r-pkgs.had.co.nz/man.html#text-formatting) to text formatting in roxygen tags. 
 
-The first sentence in the roxygen comment block becomes the title. The second paragraph becomes the description, and all subsequent paragraphs go into the later Details section. Section headers may be added with the `@section Section name` tag. 
+The first sentence in the roxygen comment block becomes the title. The second paragraph becomes the description, and all subsequent paragraphs make the later Details section. Section headers may be added with the `@section Section name` tag. 
 
 Include `@export` to make the function visible to end users (sends the function to NAMESPACE). Export the minimum number of functions an end user should need. 
 
-Aliases are alternative searches that redirect to the help page for this function. Keywords must be taken from [this predefined list](https://svn.r-project.org/R/trunk/doc/KEYWORDS). 
+Aliases are alternative searches that redirect to the function's help page. Keywords must be taken from [this predefined list](https://svn.r-project.org/R/trunk/doc/KEYWORDS). 
 
-Examples should run quickly (use toy data), and will run during checks. 
+Examples should complete quickly (use toy data), and will run during checks. 
 
-When using an external function from another package using `package::function()` (make sure package is listed in Imports field of DESCRIPTION), there is no need to define an import through NAMESPACE, and thus no roxygen comments are needed. However, using `package::function()` is slightly slower, so, to import and *attach* the external function, use a roxygen comment `@importFrom pkg func` and use the function without `::`.  
+When using an external function from another package using `package::function()` (ensuring package is listed in Imports field of DESCRIPTION), there is no need to define an import through NAMESPACE, and thus no roxygen comments are required. However, using `package::function()` is slightly slower, so, for functions that are heavily used, import and *attach* the external function with the roxygen tag `@importFrom pkg func` and use the function without `::`.  
 
 
 Other useful roxygen tags are:
