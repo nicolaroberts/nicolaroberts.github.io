@@ -119,6 +119,15 @@ Package functions that are exported to the user should start with thorough input
 When using functions from external packages, explicitly refer to the other package using `package::function()`. This makes it easier to see when external packages should be added to the Includes field of the DESCRIPTION file. When using an external function from a package that is merely in Suggests, first test whether or not the package is installed (`requireNamespace('pkg', quietly=TRUE)`), and handle either case. 
 
 
+To display a message upon package start up, use the following template in a special `zzz.R` file:
+
+{% highlight r %}
+.onAttach <- function(libname, pkgname){
+	packageStartupMessage("Welcome!")
+}
+{% endhighlight %}
+
+
 ## Documentation and the NAMESPACE file with roxygen2
 
 Manual help pages to document exported functions or classes go in `.Rd` files in the `man/` directory, but don't write these files directly! Rather, use roxygen2 to generate the documentation for you. 
