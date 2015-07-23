@@ -6,7 +6,7 @@ tags: [R, R package]
 modified: 2015-07-23
 ---
 
-In part 1: R package set up, directory structure, the DESCRIPTION file, writing R code, using roxygen2 to write documentation and define the package namespace, and a simple build protocol. 
+In part 1: R package set up, directory structure, the DESCRIPTION file, writing R code for packages, using roxygen2 to write documentation and define the package namespace, and a simple build protocol. 
 
 
 Sources:
