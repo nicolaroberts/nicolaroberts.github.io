@@ -67,7 +67,7 @@ License: GPL-3
 
 For more on versioning packages, see [part 2]({{ site.url }}/r-packages-part-2). 
 
-For more on using the `Authors@R` field to record the package author, maintainer, and other contributers or copyright holders, see `?person`. 
+For more on using the `Authors@R` field to record the package author, maintainer, and other contributors or copyright holders, see `?person`. 
 
 For more on choosing a license, see [Hadley Wickham's advice](http://r-pkgs.had.co.nz/description.html#license). To specify a non-standard license, write a file `inst/LICENSE`, and use `License: file LICENSE`. *For Sanger work, see CGP wiki on licensing code for external release.*
 
@@ -107,7 +107,7 @@ All R code goes in `.R` files in the `R/` directory. Group functions meaningfull
 
 Using Hadley's [recommended style](http://r-pkgs.had.co.nz/r.html#style), variables and functions should have lower case names with underscores separating words. Try to use nouns for variables and verbs for functions. To avoid potential conflict with other packages, try to define unique function names. Use comments to explain the why not the what, and break files up into readable chunks using commented lines of hyphens. Run `lintr::lint_package()` to find any breaches of lintr's default style guide. 
 
-R package code should never change the user's R landscape. That is, the behaviour of any external function should be the same before and after use of your package. For this reason, never use `library()`, `require()`, or `source()` in a pacakge. When changing `options()` or `par()`, save the old values first and reset when done.
+R package code should never change the user's R landscape. That is, the behaviour of any external function should be the same before and after use of your package. For this reason, never use `library()`, `require()`, or `source()` in a package. When changing `options()` or `par()`, save the old values first and reset when done.
 
 {% highlight r %}
 par_old <- par(no.readonly=TRUE)
@@ -116,7 +116,7 @@ on.exit(par(par_old), add=TRUE)
 
 Package functions that are exported to the user should start with thorough input checks using `stop()` to throw errors. Following [Bioconductor guidelines](http://bioconductor.org/developers/package-guidelines/#messages), only pass messages back to the user using `stop()`, `warning()` and `message()`; reserve `cat()` and `print()` to display an object in a show method. 
 
-When using functions from external pacakges, explicitly refer to the other package using `package::function()`. This makes it easier to see when external pacakges should be added to the Includes field of the DESCRIPTION file. When using an external function from a package that is merely in Suggests, first test whether or not the package is installed (`requireNamespace('pkg', quietly=TRUE)`), and handle either case. 
+When using functions from external packages, explicitly refer to the other package using `package::function()`. This makes it easier to see when external packages should be added to the Includes field of the DESCRIPTION file. When using an external function from a package that is merely in Suggests, first test whether or not the package is installed (`requireNamespace('pkg', quietly=TRUE)`), and handle either case. 
 
 
 ## Documentation and the NAMESPACE file with roxygen2
