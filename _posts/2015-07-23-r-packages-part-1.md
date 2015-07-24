@@ -90,7 +90,7 @@ Collate: classes.R generics.R methods.R functions.R
 
 Packages listed in Depends will be attached in their entirety, so only list here if your package is primarily designed for use in conjunction with another. Packages listed in Imports will load but not attach, and this is generally preferable to Depends. Packages that are only used in vignettes or examples should be listed in Suggests. 
 
-For submission to Bioconductor, list a controlled set of keywords in biocViews (possible keywords can be found [here](http://bioconductor.org/packages/devel/BiocViews.html). 
+For submission to Bioconductor, list a controlled set of keywords in biocViews (possible keywords can be found [here](http://bioconductor.org/packages/devel/BiocViews.html)). 
 
 Use LazyData to turn on [lazy-loading](https://cran.r-project.org/doc/manuals/r-release/R-ints.html#Lazy-loading). 
 
