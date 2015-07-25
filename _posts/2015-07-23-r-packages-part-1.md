@@ -3,7 +3,7 @@ layout: post
 title: "R packages part 1: up and running"
 description: "R package set up, structure, DESCRIPTION file, R source code, documentation, NAMESPACE, etc."
 tags: [R, R package]
-modified: 2015-07-23
+modified: 2015-07-24
 ---
 
 In part 1: R package set up, directory structure, the DESCRIPTION file, writing R code for packages, using roxygen2 to write documentation and define the package namespace, and a simple build protocol. 
@@ -47,7 +47,7 @@ In keeping with [Bioconductor's style preference](http://www.bioconductor.org/de
 
 * src/ directory with any C or C++ code
 * vignettes/ directory of tutorial vignettes in `.Rnw` or `.Rmd` files
-* data/ directory containing saved R objects in `.Rda` files (used for examples or unit tests)
+* data/ directory containing saved R objects in `.rda` files (used for examples or unit tests)
 * inst/ directory for other files including citation instructions, non-standard license definitions, non-standard data formats, etc. 
 
 
@@ -76,7 +76,7 @@ For more on choosing a license, see [Hadley Wickham's advice](http://r-pkgs.had.
 {% highlight debcontrol %}
 Type: Package
 Date: 2015-01-30
-Depends: R(>=3.1.2) 
+Depends: R(>= 3.1.2) 
 Imports: MASS(>=7.3.0), dplyr
 Suggests: knitr, BiocStyle 
 biocViews: Software, StatisticalMethod, Clustering 
@@ -92,7 +92,7 @@ Packages listed in Depends will be attached in their entirety, so only list here
 
 For submission to Bioconductor, list a controlled set of keywords in biocViews (possible keywords can be found [here](http://bioconductor.org/packages/devel/BiocViews.html)). 
 
-Use LazyData to turn on [lazy-loading](https://cran.r-project.org/doc/manuals/r-release/R-ints.html#Lazy-loading). 
+When including data with a package, use LazyData to turn on [lazy-loading](https://cran.r-project.org/doc/manuals/r-release/R-ints.html#Lazy-loading).
 
 To use compiled code from another package, list it in LinkingTo. 
 
