@@ -3,8 +3,7 @@ layout: post
 title: "R packages part 2: on a roll"
 description: "Versioning, GitHub release, data, other files, testing, and vignettes."
 tags: [R, R package]
-modified: 2015-07-28
-published: false
+modified: 2015-07-29
 ---
 
 In part 2: versioning, GitHub release, data, other files, testing, and vignettes.
@@ -36,20 +35,20 @@ To signify a major redesign with increased `x`, set `y` to 99 in the development
 
 For an in-depth explanation of version control and code release using git and GitHub for R package development, see [Hadley Wickham's chapter](http://r-pkgs.had.co.nz/git.html). In brief:
 
-* use git version control for local package development from the start (can turn on within RStudio)
-* create GitHub repo with same name as the package
-* set remote origin of the local git repo to `git@github.com:username/packagename.git`
-* write a `README.md` file to describe the package to GitHub users - include installation instructions e.g. `devtools::install_github('username/packagename')`
-* push public versions to GitHub, bumping up the version number `z` each time, and ensuring `R CMD CHECK` passes
+* use git version control for local package development from the start (can turn on within RStudio),
+* create GitHub repo with same name as the package,
+* set remote origin of the local git repo to `git@github.com:username/packagename.git`,
+* write a `README.md` file to describe the package to GitHub users - include installation instructions e.g. `devtools::install_github('username/packagename')`,
+* push public versions to GitHub, bumping up the version number `z` and ensuring `R CMD CHECK` passes.
 
 The URL and BugReports fields in the DESCRIPTION file can point to the package's GitHub site and issues page. Use [git tags](http://git-scm.com/book/en/v2/Git-Basics-Tagging) to mark important versions.  
 
 
 ## Data
 
-Data can be included in an R package as a means of: data release and sharing; checking package behavior with tests at build time; and demonstrating package functions through examples or vignettes. 
+Data can be included in an R package as a means of: data release and sharing; checking package behavior with automated tests; and demonstrating package functions through examples or vignettes.
 
-If the package is primarily a vehicle for data release and sharing, then the included functions should be minimal. If the package is primarily designed as analysis software, then the included data should be small. Large examples and vignettes for software packages can use large datasets from separate data packages. Note that data packages in Bioconductor are not limited by the same size restrictions that apply to software packages ([see here](http://bioconductor.org/developers/how-to/buildingPackagesForBioc/#external-data-dirs)). 
+If the package is primarily a vehicle for data release and sharing, then the included functions should be minimal. If the package is primarily designed as analysis software, then the included data should be small. Large examples and vignettes for software packages can use large datasets from separate data packages. Note that data packages in Bioconductor are not limited by the same size restrictions as apply to software packages ([see here](http://bioconductor.org/developers/how-to/buildingPackagesForBioc/#external-data-dirs)). 
 
 R data objects to be exported to the user (for examples and vignettes) go in `data/`. The code to generate these objects goes in a `data-raw/` directory. Run `devtools::use_data_raw()` to both create the `data-raw/` directory, and add it to `.Rbuildignore`. In the data generation scripts, use `devtools::use_data(object)` to create a `.rda` file with the same name as the object in `data/`.   Set `LazyData: true` in the DESCRIPTION file. Lazy-loading allows these data objects to be accessed directly in examples or vignettes (don't require explicit loading), and only take up memory in an R session when called upon.
 
@@ -88,14 +87,68 @@ The `inst/` directory can house any miscellaneous files, and these are copied in
 * inst/CITATION to give [citation instructions](http://r-pkgs.had.co.nz/inst.html#inst-citation), 
 * inst/extdata as described above.
 
-A message at pacakge start up (see [part 1]({{ site.url }}/r-packages-part-1)) is a good way to direct users to this information. For example, users could be instructed to run `citation('<pkgname>')` to see citation instructions, and `file.show(system.file("LICENSE", package='<pkgname>'))` to see the LICENSE file. 
+A message at package start up (see [part 1]({{ site.url }}/r-packages-part-1)) is a good way to direct users to this information. For example, users could be instructed to run `citation('<pkgname>')` to see citation instructions, and `file.show(system.file("LICENSE", package='<pkgname>'))` to see the LICENSE file. 
+
+## Testing
+
+Run `devtools::use_testthat()` to: create the directory `tests/testthat/`, write the file `tests/testthat.R`, and add `testthat` to the Suggests field in DESCRIPTION. Don't edit the `tests/testthat.R` file - it ensures the tests are run during `R CMD CHECK`. 
+
+Test scripts go in the `tests/testthat/` directory, and their names must start with `test`. Run `devtools::test()` to execute all test scripts. 
+
+Group related tests in the same file:
+
+{% highlight r %}
+library(<pkgname>)
+context("Context for this group of tests")
+
+test_that("Expectation being tested", {
+	expect_equal(my_func(input1), output1)
+	expect_equal(my_func(input2), output2)
+	expect_equal(my_func(input3), output3)
+})
+
+test_that("Expectation being tested", {
+	expect_error(my_func(input1), "part of expected error msg")
+	expect_error(my_func(input2), "part of expected error msg")
+	expect_error(my_func(input3), "part of expected error msg")
+})
+
+{% endhighlight %}
+
+The first argument to `test_that` should complete the sentence "Test that ...". The second argument is a code block containing one or more expectations. Types of `expect_` function include:
+
+* equal (within numeric tolerance)
+* identical (no tolerance)
+* match (against a regular expression)
+* Variants of `expect_match`:
+	* output 
+	* message
+	* warning
+	* error
+* is (inherits from specified class)
+* true
+* false
+
+To calculate the percentage of a package covered by tests, run `covr::package_coverage()`. 
+
+To test if the R code in the package follows the lintr style guide, add `lintr` to the Suggests field in DESCRIPTION and include as a test:
+
+{% highlight r %}
+if (requireNamespace("lintr", quietly = TRUE)) {
+  context("lints")
+  test_that("Package style conforms to linters", {
+    lintr::expect_lint_free()
+  })
+}
+{% endhighlight %}
+
 
 
 ## Vignettes
 
 Vignettes are tutorials stepping through one or more use cases of the package, using small real datasets. 
 
-Run `devtools::use_vignette('vig_title')` to both create the template file `vignettes/vig_title.Rmd`, and add `knitr` to the Suggests and VignetteBuilder fields in DESCRIPTION. In addition, manually add `rmarkdown` and `BiocStyle` to the Suggests field in DESCRIPTION. 
+Run `devtools::use_vignette('vig_title')` to create the template file `vignettes/vig_title.Rmd` and add `knitr` to the Suggests and VignetteBuilder fields in DESCRIPTION. In addition, manually add `rmarkdown` and `BiocStyle` to the Suggests field in DESCRIPTION. 
 
 Example metadata header:
 
@@ -126,4 +179,4 @@ Write the text of the vignette in [R-flavoured markdown](http://r-pkgs.had.co.nz
 
 Weave code and results through the text using [knitr](http://r-pkgs.had.co.nz/vignettes.html#knitr) syntax. The data used for the vignette examples can be stored in `inst/extdata` (demonstrate how to load raw data) or in `data/` (demonstrate how to work with loaded data). Remember to use Shift+Alt+K to see RStudio shortcuts - includes shortcuts for running code chunks. 
 
-At the end of the vignette, include a Session Information section showing the output from `devtools::session_info()`. 
+At the end of the vignette, include a Session Information section with the output from `devtools::session_info()`. 
