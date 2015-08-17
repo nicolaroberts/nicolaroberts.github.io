@@ -3,7 +3,7 @@ layout: post
 title: "R packages part 3: full tilt"
 description: "topics"
 tags: [R, R package]
-modified: 2015-08-14
+modified: 2015-08-17
 published: false
 ---
 
@@ -27,96 +27,113 @@ Sources:
 
 ## S4 classes and methods
 
-If defining new S4 classes and methods, add the `methods` package to the Imports field in DESCRIPTION, and include the following in `<pkgname>.R`.  
+If defining new S4 classes and methods, add the `methods` package to the Imports field in DESCRIPTION, and include the following in `<pkgname>.R`:  
 {% highlight r %}
 #' @import methods 
 NULL
 {% endhighlight %}
 
 
-Define a new class as shown below. The class name should use UpperCamelCase. The slots can be of type `ANY` (no type restriction), a base type, S4 class, or S3 class registered with `setOldClass()`. Other useful arguments to `setClass` are: `contains` for class inheritance; `validity` for object testing; and `prototype` to define default slot values. To enable class inheritance from another package, use `@importClassesFrom pkg ClassA`. If you want others to extend your class, `@export` it; if you want others to create instances of the class but not extend it, just `@export` the constructor function. 
+Define a new class as shown below. The class name should use UpperCamelCase. The slots can be of type `ANY` (no type restriction), a base type, S4 class, or S3 class registered with `setOldClass()`. To allow multiple classes in a slot, use `setClassUnion()`. The validity argument is a function of the object returning TRUE or FALSE. Other useful arguments to `setClass` are `contains` for class inheritance, and `prototype` to define default slot values. For class inheritance from another package, use `@importClassesFrom pkg ClassA` (add package to Imports field in DESCRIPTION). If you want others to extend your class, `@export` it; if you want others to create instances of the class but not extend it, just `@export` the constructor function. 
 
 {% highlight r %}
-#' An example S4 class
+#' An example S4 class for members of The Beatles
 #'
-#' @slot slota An example character value
-#' @slot slotb An example numeric value
-#' @slot slotc An example list value
-setClass("ClassName",
-	slots = list(
-		slota = "character", 
-		slotb = "numeric", 
-		slotc = "list"))
+#' @slot name First name
+#' @slot ranking Your ranking of favourites, from 1-4
+setClass("BeatlesMember",
+         slots = list(
+             name = "character",
+             ranking = "numeric"),
+         validity = function(object) {
+             is_valid <- TRUE
+             if (! object@name %in% c("John", "Paul", "George", "Ringo")) {
+                 is_valid <- FALSE
+                 message("Name is not one of John, Paul, George, or Ringo")
+             }
+             if (! object@ranking %in% 1:4) {
+                 is_valid <- FALSE
+                 message("Ranking must be 1, 2, 3 or 4")
+             }
+             return(is_valid)
+         })
 
 
-# Constructor function for users to create an instance
-#' Create an instance of ClassName
-#' 
-#' Description of ClassName
-#' 
-#' @param a Some character value
-#' @param b Some numeric value
-#' @param c Some list value
-#' 
+# Constructor function
+#' Create an instance of BeatlesMember
+#'
+#' @param name First name of Beatle's member
+#' @param ranking Your ranking of favourites, from 1-4
+#'
 #' @export
-#' 
+#'
 #' @examples
-#' classname(a='test', b=1, c=list(foo=3, bar=4))
-
-classname <- function(a, b, c){
-	ans <- new('ClassName', slota=a, slotb=b, slotc=c)
-	return(ans)
+#' beatles_member('John', 1)
+beatles_member <- function(name, ranking){
+    ans <- new("BeatlesMember", name=name, ranking=ranking)
+    return(ans)
 }
 {% endhighlight %}
 
-A generic function dispatches a method implementation specific to the class of the argument. To define a method for an S4 class, the generic function must first be defined. If it has already been defined in another package (e.g. `BiocGenerics`), then use that pre-existing definition by including the roxygen comment `#' @importMethodsFrom pkg GenericA` above your method definition. If you want a newly defined generic to be publically usable, `@export` it. 
+
+Functions of S4 classes may be written as "regular" functions, or as S4 methods dispatched via a generic function. As a general rule, write S4 generics and methods if the function is a common task that could have multiple class-specific implementations, e.g. plot, append, sort, unique. Setters and getters are also convenient as S4 methods. In contrast, if the function is highly specific to your package just implement it as a regular function (checking the input has the correct class).  
+
+A generic function dispatches a method implementation specific to the class of the argument. The generic function must be defined *before* the method. If it has already been defined in another package (e.g. `BiocGenerics`), then use that pre-existing definition by including the roxygen comment `#' @importMethodsFrom pkg GenericA` above your method definition (and add package to Imports field in DESCRIPTION). To define a new generic, use the `setGeneric` function, and possibly `@export` it to users. 
+
+To define a method, use the `setMethod` function as shown below, with the argument name/s to the function exactly matching the argument name/s in the generic (even if it was defined by someone else). `@export` every method, and possibly use `@describeIn` to merge documentation with the class or the generic. 
+
+{% highlight r %}
+#' @importMethodsFrom BiocGenerics as.data.frame
+#' @describeIn BeatlesMember convert to data.frame
+#' @param x Object of class BeatlesMember
+#' @export
+setMethod("as.data.frame",
+          signature = "BeatlesMember",
+          definition = function(x, ...) {
+              ans <- data.frame(name=x@name, ranking=x@ranking)
+              return(ans)
+          })
+{% endhighlight %}
+
+
+Slots of an S4 object can be accessed (get and set) via `@` or `slot()`. However, this requires specific knowledge of the implementation (slot names). A better approach for the user is to define accessor methods for getting/setting data. Remember to check `validObject(x)==TRUE` before returning an object with a new slot value. 
 
 {% highlight r %}
 # only set the generic like this if it does not already exist
-#' do method
-#' @param x input of some class, e.g. ClassName
-#' @seealso class?ClassName
-setGeneric("methodname", function(x, ...) standardGeneric("methodname"))
+#' Get 'name' slot from S4 class
+#' @param x Object of S4 class with slot 'name'
+setGeneric("name", function(x, ...) standardGeneric("name"))
+
+#' @describeIn BeatlesMember get name value
+#' @export
+setMethod("name", "BeatlesMember", function(x) x@name)
+
+#' Set 'name' slot from S4 class
+#' @param x Object of S4 class with slot 'name'
+setGeneric("name<-", function(x, value) standardGeneric("name<-"))
+
+#' @describeIn BeatlesMember set name value
+#' @param value replacement value
+#' @export
+setReplaceMethod("name",
+                 "BeatlesMember",
+                 function(x, value) {
+                     x@name <- value
+                     if (validObject(x)) return(x)
+                 })
 {% endhighlight %}
 
-Must `@export` every method. The argument name/s to `function` in `setMethod` must match the argument name/s in the generic. For a pre-defined generic, just type the name to see what the argument names must be. Method documentation could go:
-
-* in the class - if you've written the class (use `@describeIn`)
-* in the generic - if you've written the generic (use `@describeIn`)
-* in its own file - if you've not written the class or generic
+A special method called `show` controls how the object is printed to console when the object name is typed by itself. Note that the `show` generic is provided by the `methods` package. 
 
 {% highlight r %}
-#' @describeIn ClassName Method for this class
-#' @param x Object of class ClassName
-#' @export 
-setMethod("methodname", 
-	signature = "ClassName", 
-	definition = function(x) {
-		print(x)
-	})
-{% endhighlight %}
+setMethod("show",
+          "BeatlesMember",
+          function(object) {
+              cat("Object of class", class(object), "\n")
+              cat(" name:", object@name, "\n")
+              cat(" ranking:", object@ranking, "\n")
+          })
+{% endhighlight %} 
 
-
-Slots of an S4 object can be accessed (get and set) via `@` or `slot()`. However, this requires specific knowledge of the implementation (slot names). A better approach for the user is to define accessor methods for getting/setting data. 
-
-{% highlight r %}
-setGeneric("slota", function(x, ...) standardGeneric("slota"))
-
-setMethod("slota", "ClassName", function(x) x@slota)
-
-setGeneric("slota<-", function(x, value) standardGeneric("slota<-"))
-
-setReplaceMethod("slota", 
-	"ClassName",
-	function(x, value) {
-		x@slota <- value
-		return(x)
-	})
-
-{% endhighlight %}
-
-
-### Load order
-
-When working with S4, the code must be loaded in the order: classes, generic, methods+other. The default is for R package code to load alphabetically by file name. To ensure classes and generics are loaded first, they could be placed in files `aaa-classes.R` and `aaa-generics.R` respectively. Alternatively, use the `@include` roxygen tag at the top of a file to list all the other source code files that should be loaded beforehand. This information gets collected up and used to set the `Collates` field in DESCRIPTION (specifies a non-default load order). 
+When working with S4, the code must be loaded in the order: classes, generics, methods+other. The default is for R package code to load alphabetically by file name. To ensure classes and generics are loaded first, they could be placed in files `aaa-classes.R` and `aaa-generics.R` respectively. Alternatively, use the `@include` roxygen tag at the top of a file to list all the other source code files that should be loaded beforehand. This information is used to set the `Collates` field in DESCRIPTION (specifies a non-default load order). 
 
