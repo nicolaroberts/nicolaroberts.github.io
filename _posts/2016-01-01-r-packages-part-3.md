@@ -1,13 +1,13 @@
 ---
 layout: post
 title: "R packages part 3: full tilt"
-description: "topics"
+description: "S4 classes, compiled code, and automated checking with Travis CI"
 tags: [R, R package]
-modified: 2015-08-17
+modified: 2015-08-19
 published: false
 ---
 
-In part 3: compiled code, TRAVIS checking and BiocChecking, S4 classes, release on CRAN or Bioconductor, package at different stages. 
+In part 3: S4 classes and methods, compiled code, and automated checking with Travis CI.  
 
 See [part 1]({{ site.url }}/r-packages-part-1) for R package set up, directory structure, the DESCRIPTION file, writing R code for packages, using roxygen2 to write documentation and define the package namespace, and a simple build protocol. 
 
@@ -34,7 +34,7 @@ NULL
 {% endhighlight %}
 
 
-Define a new class as shown below. The class name should use UpperCamelCase. The slots can be of type `ANY` (no type restriction), a base type, S4 class, or S3 class registered with `setOldClass()`. To allow multiple classes in a slot, use `setClassUnion()`. The validity argument is a function of the object returning TRUE or FALSE. Other useful arguments to `setClass` are `contains` for class inheritance, and `prototype` to define default slot values. For class inheritance from another package, use `@importClassesFrom pkg ClassA` (add package to Imports field in DESCRIPTION). If you want others to extend your class, `@export` it; if you want others to create instances of the class but not extend it, just `@export` the constructor function. 
+Define a new class as shown below. The class name should use UpperCamelCase. The slots can be of type `ANY` (no type restriction), a base type, S4 class, or S3 class registered with `setOldClass()`. To allow multiple classes in a slot, use `setClassUnion()`. The validity argument is a function of the object returning TRUE or FALSE. Other useful arguments to `setClass` are `contains` for class inheritance, and `prototype` for default slot values. For class inheritance from another package, use `@importClassesFrom pkg ClassA` (and add package to Imports field in DESCRIPTION). If you want others to extend your class, `@export` it; if you want others to create instances of the class but not extend it, just `@export` the constructor function. 
 
 {% highlight r %}
 #' An example S4 class for members of The Beatles
@@ -76,7 +76,7 @@ beatles_member <- function(name, ranking){
 {% endhighlight %}
 
 
-Functions of S4 classes may be written as "regular" functions, or as S4 methods dispatched via a generic function. As a general rule, write S4 generics and methods if the function is a common task that could have multiple class-specific implementations, e.g. plot, append, sort, unique. Setters and getters are also convenient as S4 methods. In contrast, if the function is highly specific to your package just implement it as a regular function (checking the input has the correct class).  
+Functions of S4 classes may be written as "regular" functions, or as S4 methods dispatched via a generic function. As a general rule, write S4 generics and methods if the function is a common task that could have multiple class-specific implementations, e.g. plot, append, sort, unique, as.data.frame etc. Setters and getters are also convenient as S4 methods. In contrast, if the function is highly specific to your package, just implement it as a regular function (checking the input has the correct class).  
 
 A generic function dispatches a method implementation specific to the class of the argument. The generic function must be defined *before* the method. If it has already been defined in another package (e.g. `BiocGenerics`), then use that pre-existing definition by including the roxygen comment `#' @importMethodsFrom pkg GenericA` above your method definition (and add package to Imports field in DESCRIPTION). To define a new generic, use the `setGeneric` function, and possibly `@export` it to users. 
 
@@ -96,7 +96,7 @@ setMethod("as.data.frame",
 {% endhighlight %}
 
 
-Slots of an S4 object can be accessed (get and set) via `@` or `slot()`. However, this requires specific knowledge of the implementation (slot names). A better approach for the user is to define accessor methods for getting/setting data. Remember to check `validObject(x)==TRUE` before returning an object with a new slot value. 
+Slots of an S4 object can be accessed (get and set) via `@` or `slot()`. However, this requires specific knowledge of the implementation (slot names). Defined accessor methods are a better approach for general users. Remember to check `validObject(x)==TRUE` before returning an object with a new slot value. 
 
 {% highlight r %}
 # only set the generic like this if it does not already exist
@@ -123,7 +123,7 @@ setReplaceMethod("name",
                  })
 {% endhighlight %}
 
-A special method called `show` controls how the object is printed to console when the object name is typed by itself. Note that the `show` generic is provided by the `methods` package. 
+A special method called `show` controls how the object is printed to console. Note that the `show` generic is provided by the `methods` package. 
 
 {% highlight r %}
 setMethod("show",
@@ -136,4 +136,46 @@ setMethod("show",
 {% endhighlight %} 
 
 When working with S4, the code must be loaded in the order: classes, generics, methods+other. The default is for R package code to load alphabetically by file name. To ensure classes and generics are loaded first, they could be placed in files `aaa-classes.R` and `aaa-generics.R` respectively. Alternatively, use the `@include` roxygen tag at the top of a file to list all the other source code files that should be loaded beforehand. This information is used to set the `Collates` field in DESCRIPTION (specifies a non-default load order). 
+
+
+## Compiled code
+
+
+## Automated checking with Travis CI
+
+During development, run `devtools::check()` and strive to eliminate all errors, warnings, and notes from [these checks](http://r-pkgs.had.co.nz/check.html#check-checks). 
+
+To automatically run `R CMD check` after every push to GitHub: 
+
+* Run `devtools::use_travis()` to generate the `.travis.yml` config file and update `.Rbuildignore` accordingly.  The basic config options are automatically included, with more advanced options described in the [docs](http://docs.travis-ci.com/user/languages/r/). Push to GitHub. 
+* Log in to Travis (linked to your GitHub account), and turn on the repo you want to test (will automatically run after every push to GitHub). 
+* Embed Travis status image (failing/passing) in the README.md:
+
+
+{% highlight r %}
+[![Build Status](https://travis-ci.org/<USR>/<REPO>.svg?branch=master)](https://travis-ci.org/<USR>/<REPO>)
+{% endhighlight %}
+
+
+For BioConductor, the package must also pass `BiocCheck::BiocCheck("/path/to/pkg")`. To automate with Travis, add the following code to `.travis.yml` (taken from [Przemol](https://github.com/Przemol/seqplots/blob/master/.travis.yml)).
+
+{% highlight r %}
+bioc_required: true
+bioc_packages:
+  - BiocCheck
+
+after_script:
+  - ls -lah
+  - FILE=$(ls -1t *.tar.gz | head -n 1)
+  - Rscript -e "library(BiocCheck); BiocCheck(\"${FILE}\")"
+{% endhighlight %}
+
+
+
+## Submission to CRAN or Bioconductor
+
+Info on [submitting package to CRAN](http://r-pkgs.had.co.nz/release.html).
+
+Info on submitting package to BioConductor is [here](http://bioconductor.org/developers/package-submission/), [here](http://bioconductor.org/developers/package-guidelines/#responsibilities) and [here](http://bioconductor.org/developers/how-to/git-mirrors/).  
+
 
