@@ -3,7 +3,7 @@ layout: post
 title: "R packages part 3: full tilt"
 description: "S4 classes, compiled code, and automated checking with Travis CI"
 tags: [R, R package]
-modified: 2015-08-19
+modified: 2015-08-23
 published: false
 ---
 
@@ -140,6 +140,69 @@ When working with S4, the code must be loaded in the order: classes, generics, m
 
 ## Compiled code
 
+Any C/C++ code (including header files) belong in the `src/` directory. 
+
+#### Instructions for C++ or C
+
+Set up a `src/.gitignore` file to ignore `*.o`, `*.so` and `*.dll` files (this will be auto-generated if you run `devtools::use_rcpp()`). 
+
+To access compiled C/C++ functions from R through the `.Call()` function, include the roxygen tag `@useDynLib pkgname` (for all compiled routines, place in `pkgname.R`) or `@useDynLib pkgname routine` (for a specific routine, place alongside wrapper R function).
+
+Write `.onUnload()` function (place in `pkgname.R`) to clean up when the package is unloaded. 
+
+{% highlight r %}
+.onUnload <- function(libpath){
+  library.dynam.unload("pkgname", libpath)
+}
+{% endhighlight %}
+
+
+
+#### C with the R API
+
+Using C in R packages is only recommended for legacy code. 
+
+C files must include:
+
+{% highlight c %}
+#include <R.h>
+#include <Rinternals.h>
+{% endhighlight %}
+
+To interface with R, C functions must both input and output SEXP (S expression) types. The actual work of the function is easiest to perform with native C data structures, so the first and last steps are usually conversion from/to SEXP to/from C types. Remember to `PROTECT()` (and later `UNPROTECT()`) any SEXP object created in C to save it from R's garbage collector. 
+
+Compiled functions should be called via a wrapper R function, and the classes of the inputs can be checked within this wrapper. Roxygen documentation should be written alongside this wrapper. 
+
+{% highlight r %}
+illustrate <- function(x, y) {
+  .Call('illustrate', PACKAGE='pkgname', x, y)
+}
+{% endhighlight %}
+
+More info on using C with R is available [here](http://adv-r.had.co.nz/C-interface.html) and [here](http://r-pkgs.had.co.nz/src.html#clang).
+
+
+#### C++ with Rcpp
+
+Run `devtools::use_rcpp()` to add Rcpp to the LinkingTo and Imports fields in DESCRIPTION, set up the `.gitignore` file as described above. 
+
+Include roxygen tag `@importFrom Rcpp sourceCpp` in `pkgname.R` (don't actually need `sourceCpp`, but a bug in R means something has to be imported so the internal Rcpp code gets properly loaded). 
+
+C++ files must include:
+
+{% highlight r %}
+#include <Rcpp.h>
+using namespace Rcpp;
+{% endhighlight %}
+
+Rcpp will do the hard work of setting up functions of SEXP objects for you, so just write the C++ functions in terms of native C++ types, and preface the function with the special comment `// [[Rcpp::export]]`. Run `devtools::document()` and then build and reload the package. This automatically calls `Rcpp::compileAttributes()` and auto-generates the files `src/RcppExports.cpp` and `R/RcppExports.R`. 
+
+The auto-generated functions in `src/RcppExports.cpp` act as the go-between for the SEXP types passed to/from R and the C++ types passed to/from your other C++ functions. 
+
+The auto-generated `R/RcppExports.R` file contains wrapper functions for calling the compiled C++ functions. This file shouldn't be edited directly, so any documentation should be written alongside the source C++ code. Write roxygen comment blocks in C++ as in R, just using `//' ` at the start of each line instead of `#' `. Note that the roxygen line `//' @export` makes the R wrapper function available to the user, while the non-roxygen line `// [[Rcpp::export]]` just makes the C++ function available to the R wrapper function (via the SEXP translator function made in `src/RcppExports.cpp`).
+
+More info on using C++ with R is available [here](http://adv-r.had.co.nz/Rcpp.html) and [here](http://r-pkgs.had.co.nz/src.html#cpp).
+
 
 ## Automated checking with Travis CI
 
@@ -171,11 +234,9 @@ after_script:
 {% endhighlight %}
 
 
-
 ## Submission to CRAN or Bioconductor
 
 Info on [submitting package to CRAN](http://r-pkgs.had.co.nz/release.html).
 
 Info on submitting package to BioConductor is [here](http://bioconductor.org/developers/package-submission/), [here](http://bioconductor.org/developers/package-guidelines/#responsibilities) and [here](http://bioconductor.org/developers/how-to/git-mirrors/).  
-
 
