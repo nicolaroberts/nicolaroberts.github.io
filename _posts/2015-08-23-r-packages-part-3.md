@@ -4,7 +4,7 @@ title: "R packages part 3: full tilt"
 description: "S4 classes, compiled code, and automated checking with Travis CI"
 tags: [R, R package]
 modified: 2015-08-23
-published: false
+published: true
 ---
 
 In part 3: S4 classes and methods, compiled code, and automated checking with Travis CI.  
@@ -27,14 +27,14 @@ Sources:
 
 ## S4 classes and methods
 
-If defining new S4 classes and methods, add the `methods` package to the Imports field in DESCRIPTION, and include the following in `<pkgname>.R`:  
+If defining new S4 classes and methods, add the `methods` package to the Imports field in DESCRIPTION, and include the following in `pkgname.R`:  
 {% highlight r %}
 #' @import methods 
 NULL
 {% endhighlight %}
 
 
-Define a new class as shown below. The class name should use UpperCamelCase. The slots can be of type `ANY` (no type restriction), a base type, S4 class, or S3 class registered with `setOldClass()`. To allow multiple classes in a slot, use `setClassUnion()`. The validity argument is a function of the object returning TRUE or FALSE. Other useful arguments to `setClass` are `contains` for class inheritance, and `prototype` for default slot values. For class inheritance from another package, use `@importClassesFrom pkg ClassA` (and add package to Imports field in DESCRIPTION). If you want others to extend your class, `@export` it; if you want others to create instances of the class but not extend it, just `@export` the constructor function. 
+Define a new class as shown below. The class name should use UpperCamelCase. The slots can be of type `ANY` (no type restriction), a base type, S4 class, or S3 class registered with `setOldClass()`. To allow multiple classes in a slot, use `setClassUnion()`. The validity argument is a function of the object returning TRUE or FALSE. Other useful arguments to `setClass` are `contains` for class inheritance, and `prototype` for default slot values. For class inheritance from another package, use `@importClassesFrom pkg ClassName` (and add package to Imports field in DESCRIPTION). If you want others to extend your class, `@export` it; if you want others to create instances of the class but not extend it, just `@export` the constructor function. 
 
 {% highlight r %}
 #' An example S4 class for members of The Beatles
@@ -78,7 +78,7 @@ beatles_member <- function(name, ranking){
 
 Functions of S4 classes may be written as "regular" functions, or as S4 methods dispatched via a generic function. As a general rule, write S4 generics and methods if the function is a common task that could have multiple class-specific implementations, e.g. plot, append, sort, unique, as.data.frame etc. Setters and getters are also convenient as S4 methods. In contrast, if the function is highly specific to your package, just implement it as a regular function (checking the input has the correct class).  
 
-A generic function dispatches a method implementation specific to the class of the argument. The generic function must be defined *before* the method. If it has already been defined in another package (e.g. `BiocGenerics`), then use that pre-existing definition by including the roxygen comment `#' @importMethodsFrom pkg GenericA` above your method definition (and add package to Imports field in DESCRIPTION). To define a new generic, use the `setGeneric` function, and possibly `@export` it to users. 
+A generic function dispatches a method implementation specific to the class of the argument. The generic function must be defined *before* the method. If it has already been defined in another package (e.g. `BiocGenerics`), then use that pre-existing definition by including the roxygen comment `#' @importMethodsFrom pkg generic.name` above your method definition (and add package to Imports field in DESCRIPTION). To define a new generic, use the `setGeneric` function, and possibly `@export` it to users. 
 
 To define a method, use the `setMethod` function as shown below, with the argument name/s to the function exactly matching the argument name/s in the generic (even if it was defined by someone else). `@export` every method, and possibly use `@describeIn` to merge documentation with the class or the generic. 
 
@@ -169,9 +169,9 @@ C files must include:
 #include <Rinternals.h>
 {% endhighlight %}
 
-To interface with R, C functions must both input and output SEXP (S expression) types. The actual work of the function is easiest to perform with native C data structures, so the first and last steps are usually conversion from/to SEXP to/from C types. Remember to `PROTECT()` (and later `UNPROTECT()`) any SEXP object created in C to save it from R's garbage collector. 
+To interface with R, C functions must both input and output SEXP (S expression) types (first and last steps are usually conversion between SEXP and C types). Remember to `PROTECT()` (and later `UNPROTECT()`) any SEXP object created in C to save it from R's garbage collector. 
 
-Compiled functions should be called via a wrapper R function, and the classes of the inputs can be checked within this wrapper. Roxygen documentation should be written alongside this wrapper. 
+Compiled functions should be called via a wrapper R function (with accompanying roxygen documentation), and the input classes can be checked within the wrapper.
 
 {% highlight r %}
 illustrate <- function(x, y) {
@@ -184,7 +184,7 @@ More info on using C with R is available [here](http://adv-r.had.co.nz/C-interfa
 
 #### C++ with Rcpp
 
-Run `devtools::use_rcpp()` to add Rcpp to the LinkingTo and Imports fields in DESCRIPTION, set up the `.gitignore` file as described above. 
+Run `devtools::use_rcpp()` to add Rcpp to the LinkingTo and Imports fields in DESCRIPTION and set up the `.gitignore` file as described above. 
 
 Include roxygen tag `@importFrom Rcpp sourceCpp` in `pkgname.R` (don't actually need `sourceCpp`, but a bug in R means something has to be imported so the internal Rcpp code gets properly loaded). 
 
