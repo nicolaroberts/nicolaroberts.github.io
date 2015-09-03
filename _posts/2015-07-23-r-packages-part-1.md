@@ -48,7 +48,7 @@ In keeping with [Bioconductor's style preference](http://www.bioconductor.org/de
 * src/ directory with any C or C++ code
 * vignettes/ directory of tutorial vignettes in `.Rnw` or `.Rmd` files
 * data/ directory containing saved R objects in `.rda` files (used for examples or unit tests)
-* inst/ directory for other files including citation instructions, non-standard license definitions, non-standard data formats, etc. 
+* inst/ directory for other files including citation instructions, non-standard copyright definitions, non-standard data formats, etc. 
 
 
 ## DESCRIPTION file
@@ -69,7 +69,7 @@ For more on versioning packages, see [part 2]({{ site.url }}/r-packages-part-2).
 
 For more on using the `Authors@R` field to record the package author, maintainer, and other contributors or copyright holders, see `?person`. 
 
-For more on choosing a license, see [Hadley Wickham's advice](http://r-pkgs.had.co.nz/description.html#license). To specify a non-standard license, write a file `inst/LICENSE`, and use `License: file LICENSE`. *For Sanger work, see CGP wiki on licensing code for external release.*
+For more on choosing a license, see [Hadley Wickham's advice](http://r-pkgs.had.co.nz/description.html#license). To specify a non-standard license, write a file `LICENSE` in the top-level directory, and use `License: file LICENSE`. *For Sanger work, see CGP wiki on licensing code for external release.*
 
 #### Optional fields
 

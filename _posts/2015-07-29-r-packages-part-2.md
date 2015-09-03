@@ -83,7 +83,6 @@ The `inst/` directory can house any miscellaneous files, and these are copied in
 
 * inst/AUTHOR to describe non-standard authorship,
 * inst/COPYRIGHT to describe non-standard copyright,
-* inst/LICENSE to describe non-standard licensing,
 * inst/CITATION to give [citation instructions](http://r-pkgs.had.co.nz/inst.html#inst-citation), 
 * inst/extdata as described above.
 
