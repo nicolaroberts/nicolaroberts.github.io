@@ -116,7 +116,7 @@ on.exit(par(par_old), add=TRUE)
 
 Package functions that are exported to the user should start with thorough input checks using `stop()` to throw errors. Following [Bioconductor guidelines](http://bioconductor.org/developers/package-guidelines/#messages), only pass messages back to the user using `stop()`, `warning()` and `message()`; reserve `cat()` and `print()` to display an object in a show method. 
 
-When using functions from external packages, explicitly refer to the other package using `package::function()`. This makes it easier to see when external packages should be added to the Includes field of the DESCRIPTION file. When using an external function from a package that is merely in Suggests, first test whether or not the package is installed (`requireNamespace('pkg', quietly=TRUE)`), and handle either case. 
+When using functions from external packages, explicitly refer to the other package using `package::function()`. This makes it easier to see when external packages should be added to the Imports field of the DESCRIPTION file. When using an external function from a package that is merely in Suggests, first test whether or not the package is installed (`requireNamespace('pkg', quietly=TRUE)`), and handle either case. 
 
 
 To display a message upon package start up, use the following template in a special `zzz.R` file:
